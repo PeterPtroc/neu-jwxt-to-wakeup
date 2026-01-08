@@ -70,7 +70,7 @@
             let weeksAndTeachers = item.weeksAndTeachers || "";
             let teacher = "";
             let parts = weeksAndTeachers.split('/');
-            if (parts.length > 0) teacher = parts[parts.length - 1];
+            if (parts.length > 0) teacher = parts[parts.length - 1].replace(/\[主讲\]/g, "");
 
             // 遍历 titleDetail 解析具体的周数和地点
             let details = item.titleDetail;
@@ -84,10 +84,11 @@
 
                     let dParts = dStr.split(" ");
                     let weeksRaw = dParts[0];
-                    let location = dParts[dParts.length - 1];
+                    // 修复：如果 split 后只有一个元素，说明没有地点，location 应为空
+                    let location = dParts.length > 1 ? dParts[dParts.length - 1] : "";
 
                     if (location && location.endsWith("校区")) {
-                        location = "暂未安排教室";
+                        location = "待定";
                     }
 
                     // 格式化周数
