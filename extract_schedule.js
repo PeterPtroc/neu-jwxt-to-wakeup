@@ -19,12 +19,11 @@
     }
 
     // 判断实验课 titleDetail 末尾字段是否其实是教学班名称，而不是地点。
-    // 例如："第3实验班"、"计算机2402-03"。
+    // 教学班格式为“专业名 + 四位数字”，部分数据后面还会带班级范围后缀，如“计算机2402-03”。
     function isLabClassName(value) {
         if (!value) return false;
 
-        return /实验班$/.test(value) ||
-            /^[\u4e00-\u9fa5A-Za-z]+\d{4}-\d{1,2}$/.test(value);
+        return /^[\u4e00-\u9fa5A-Za-z]+\d{4}(?:-\d{1,2})?$/.test(value);
     }
 
     try {
@@ -97,7 +96,7 @@
                     let location = dParts.length > 1 ? dParts[dParts.length - 1] : "";
 
                     // 实验课的 titleDetail 可能在周数后返回教学班名称，而不是教室。
-                    // 避免将 "第3实验班"、"计算机2402-03" 等班级信息误导出为地点。
+                    // 避免将“专业名 + 四位数字”（如“计算机2402-03”）误导出为地点。
                     if (courseName.startsWith("[实]") && isLabClassName(location)) {
                         location = "";
                     }
