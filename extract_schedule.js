@@ -18,6 +18,14 @@
         return await resp.json();
     }
 
+    // 判断实验课 titleDetail 末尾字段是否其实是教学班名称，而不是地点。
+    // 教学班格式为“专业名 + 四位数字”，部分数据后面还会带班级范围后缀，如“计算机2402-03”。
+    function isLabClassName(value) {
+        if (!value) return false;
+
+        return /^[\u4e00-\u9fa5A-Za-z]+\d{4}(?:-\d{1,2})?$/.test(value);
+    }
+
     try {
         // 1. 获取当前用户信息及学期代码
         console.log("获取当前学期信息...");
@@ -84,8 +92,14 @@
 
                     let dParts = dStr.split(" ");
                     let weeksRaw = dParts[0];
-                    // 修复：如果 split 后只有一个元素，说明没有地点，location 应为空
+                    // 如果 split 后只有一个元素，说明没有地点，location 应为空
                     let location = dParts.length > 1 ? dParts[dParts.length - 1] : "";
+
+                    // 实验课的 titleDetail 可能在周数后返回教学班名称，而不是教室。
+                    // 避免将“专业名 + 四位数字”（如“计算机2402-03”）误导出为地点。
+                    if (courseName.startsWith("[实]") && isLabClassName(location)) {
+                        location = "";
+                    }
 
                     if (location && location.endsWith("校区")) {
                         location = "待定";
